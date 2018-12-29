@@ -25,7 +25,6 @@ class MainActivity : FragmentActivity() {
 
     var selectedFragment = 0
 
-    private val calendar = Calendar.getInstance()
     private var itemCurrent = LampModel(false, "")
 
     private val mqttClient by lazy {
@@ -56,7 +55,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun Date.toSimpleString() : String {
-        val format = SimpleDateFormat("MM/dd/yy hh:mm", Locale.getDefault())
+        val format = SimpleDateFormat(TimeFormat, Locale.getDefault())
         return format.format(this)
     }
 
@@ -133,7 +132,7 @@ class MainActivity : FragmentActivity() {
         setupMqtt()
 
         btnSwitch.setOnClickListener {
-            itemCurrent = LampModel(!itemCurrent.isLampOn, calendar.time.toSimpleString())
+            itemCurrent = LampModel(!itemCurrent.isLampOn, Calendar.getInstance().time.toSimpleString())
 
             Toast.makeText(this, if (itemCurrent.isLampOn) "Lampu Menyala" else "Lampu Mati", Toast.LENGTH_SHORT).show()
             btnSwitch.supportImageTintList = if (itemCurrent.isLampOn) {
