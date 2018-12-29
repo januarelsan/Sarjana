@@ -42,6 +42,8 @@ class MainActivity : FragmentActivity() {
         setContentView(R.layout.activity_main)
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        navigation.selectedItemId = R.id.navigation_home
+
         btnSwitch.setOnClickListener {
             isLampOn = !isLampOn
             Toast.makeText(this, if (isLampOn) "Lampu Menyala" else "Lampu Mati", Toast.LENGTH_SHORT).show()
