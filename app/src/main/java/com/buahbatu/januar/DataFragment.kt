@@ -1,6 +1,5 @@
 package com.buahbatu.januar
 
-import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -12,6 +11,7 @@ import android.view.ViewGroup
 import kotlinx.android.synthetic.main.data_fragment.*
 import kotlinx.android.synthetic.main.lamp_item.view.*
 
+
 class DataFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -20,35 +20,29 @@ class DataFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        rvData.adapter = Adapter()
+        val adapter = Adapter()
+        rvData.adapter = adapter
+        ptrLayout.setOnRefreshListener {
+            ptrLayout.isRefreshing = false
+            adapter.notifyDataSetChanged()
+        }
     }
 
-    class Item (val isLampOn: Boolean, val time: String)
-
     class Adapter : RecyclerView.Adapter<ViewHolder>() {
-        val itemList = mutableListOf<Item>(
-            Item(false, "Kapan-Kapan"),
-            Item(false, "Kapan-Kapan"),
-            Item(true, "Kapan-Kapan"),
-            Item(false, "Kapan-Kapan"),
-            Item(true, "Kapan-Kapan"),
-            Item(true, "Kapan-Kapan")
-        )
-
         override fun onCreateViewHolder(container: ViewGroup, vhType: Int): ViewHolder {
             val view = LayoutInflater.from(container.context).inflate(R.layout.lamp_item, container,false)
             return ViewHolder(view)
         }
 
-        override fun getItemCount() = itemList.count()
+        override fun getItemCount() = Data.itemList.size
 
         override fun onBindViewHolder(vh: ViewHolder, pos: Int) {
-            vh.bind(itemList[pos])
+            vh.bind(Data.itemList[pos])
         }
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        fun bind(item: Item){
+        fun bind(item: LampModel){
             itemView.ivLamp.imageTintList = if (item.isLampOn) {
                 ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.colorPrimary))
             } else {
