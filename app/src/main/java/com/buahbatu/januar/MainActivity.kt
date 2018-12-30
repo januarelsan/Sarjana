@@ -15,7 +15,7 @@ import java.util.*
 
 class MainActivity : FragmentActivity() {
     companion object {
-        const val SERVER_URI = "m15.cloudmqtt.com:19743"
+        const val SERVER_URI = "tcp://m15.cloudmqtt.com:19743"
         const val PUBLISH_TOPIC = "lampu"
         const val USERNAME = "gocfayyc"
         val PASSWORD = "kvkYjzypJELm".toCharArray()
@@ -84,6 +84,7 @@ class MainActivity : FragmentActivity() {
                 val data = LampModel.fromPayload(message.toString())
                 Data.itemList.add(data)
                 itemCurrent = data
+                updateButton()
                 navigation.selectedItemId = selectedFragment
             }
         } else {
@@ -119,6 +120,14 @@ class MainActivity : FragmentActivity() {
         if (mqttClient.isConnected) mqttClient.disconnect()
     }
 
+    fun updateButton() {
+        btnSwitch.supportImageTintList = if (itemCurrent.isLampOn) {
+            ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color.colorLight))
+        } else {
+            null
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -134,11 +143,7 @@ class MainActivity : FragmentActivity() {
             itemCurrent = LampModel(!itemCurrent.isLampOn, Calendar.getInstance().time.toSimpleString())
 
             Toast.makeText(this, if (itemCurrent.isLampOn) "Lampu Menyala" else "Lampu Mati", Toast.LENGTH_SHORT).show()
-            btnSwitch.supportImageTintList = if (itemCurrent.isLampOn) {
-                ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color.colorLight))
-            } else {
-                null
-            }
+            updateButton()
 
             publishMessage()
         }
