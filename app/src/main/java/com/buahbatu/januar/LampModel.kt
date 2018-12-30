@@ -2,7 +2,15 @@ package com.buahbatu.januar
 
 import io.realm.RealmObject
 
-class LampModel(val isLampOn: Boolean, val time: String) : RealmObject(){
+open class LampModel() : RealmObject() {
+    var isLampOn: Boolean = false
+    var time: String = ""
+
+    constructor(isLampOn: Boolean, time: String) : this() {
+        this.isLampOn = isLampOn
+        this.time = time
+    }
+
     private fun oneOrZero() = if (isLampOn) 1 else 0
 
     fun toPayload(): String {
@@ -17,7 +25,6 @@ class LampModel(val isLampOn: Boolean, val time: String) : RealmObject(){
             return LampModel(isLampOn, time)
         }
     }
-
 }
 
 const val TimeFormat = "MM/dd/yy hh:mm:ss.s"

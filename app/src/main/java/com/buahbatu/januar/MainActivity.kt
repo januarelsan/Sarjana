@@ -25,7 +25,7 @@ class MainActivity : FragmentActivity() {
     }
 
     // Get a Realm instance for this thread
-    val realm = Realm.getDefaultInstance()
+    private val realm by lazy { Realm.getDefaultInstance() }
 
     private var selectedFragment = 0
 
@@ -83,12 +83,12 @@ class MainActivity : FragmentActivity() {
         }
     }
 
-    fun saveData() {
+    private fun saveData() {
         // Persist your data in a transaction
-        realm.run {
-            beginTransaction()
-            realm.copyToRealm(itemCurrent)
-            commitTransaction()
+        realm.executeTransaction {
+            val data = it.createObject(LampModel::class.java)
+            data.isLampOn = itemCurrent.isLampOn
+            data.time = itemCurrent.time
         }
     }
 
@@ -132,8 +132,9 @@ class MainActivity : FragmentActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         if (mqttClient.isConnected) mqttClient.disconnect()
+        mqttClient.unregisterResources()
+        super.onDestroy()
     }
 
     fun updateButton() {
@@ -169,6 +170,14 @@ class MainActivity : FragmentActivity() {
 
     private fun runAlgo() {
         val lampData = realm.where(LampModel::class.java).findAll()
+
+        if (lampData.size < 1) {
+            Snackbar
+                .make(btnSwitch, "Data belum cukup untuk rekomendasi", Snackbar.LENGTH_SHORT)
+                .show()
+            return
+        }
+
         val clusters = Algo(lampData).run()
 
         Calendar.getInstance().run {
@@ -180,11 +189,11 @@ class MainActivity : FragmentActivity() {
 
             clusters.firstOrNull { it.x <= total }?.let {
                 val shouldOn = if(it.y >= 0.5) "menyalakan" else "matikan"
-                Snackbar.make(btnSwitch, "Anda disarankan untuk $shouldOn lampu", Snackbar.LENGTH_INDEFINITE)
+                Snackbar.make(btnSwitch, "Anda disarankan untuk $shouldOn lampu", Snackbar.LENGTH_SHORT)
                     .show()
             } ?:
             Snackbar
-                .make(btnSwitch, "Data belum cukup untuk rekomendasi", Snackbar.LENGTH_INDEFINITE)
+                .make(btnSwitch, "Data belum cukup untuk rekomendasi", Snackbar.LENGTH_SHORT)
                 .show()
 
         }
