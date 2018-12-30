@@ -1,6 +1,8 @@
 package com.buahbatu.januar
 
-class LampModel(val isLampOn: Boolean, val time: String) {
+import io.realm.RealmObject
+
+class LampModel(val isLampOn: Boolean, val time: String) : RealmObject(){
     private fun oneOrZero() = if (isLampOn) 1 else 0
 
     fun toPayload(): String {

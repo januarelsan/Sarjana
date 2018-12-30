@@ -3,15 +3,17 @@ package com.buahbatu.januar
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.widget.Toast
+import com.buahbatu.januar.kmeans.Algo
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 import java.text.SimpleDateFormat
 import java.util.*
-
 
 class MainActivity : FragmentActivity() {
     companion object {
@@ -21,6 +23,9 @@ class MainActivity : FragmentActivity() {
         val PASSWORD = "kvkYjzypJELm".toCharArray()
         var CLIENT_ID = "android-januar"
     }
+
+    // Get a Realm instance for this thread
+    val realm = Realm.getDefaultInstance()
 
     private var selectedFragment = 0
 
@@ -78,12 +83,23 @@ class MainActivity : FragmentActivity() {
         }
     }
 
+    fun saveData() {
+        // Persist your data in a transaction
+        realm.run {
+            beginTransaction()
+            realm.copyToRealm(itemCurrent)
+            commitTransaction()
+        }
+    }
+
     fun subscribeMessage() {
         if (mqttClient.isConnected) {
             mqttClient.subscribe(PUBLISH_TOPIC, 0) { _, message ->
                 val data = LampModel.fromPayload(message.toString())
                 Data.itemList.add(data)
                 itemCurrent = data
+
+                saveData()
                 updateButton()
                 navigation.selectedItemId = selectedFragment
             }
@@ -146,6 +162,31 @@ class MainActivity : FragmentActivity() {
             updateButton()
 
             publishMessage()
+        }
+
+        runAlgo()
+    }
+
+    private fun runAlgo() {
+        val lampData = realm.where(LampModel::class.java).findAll()
+        val clusters = Algo(lampData).run()
+
+        Calendar.getInstance().run {
+            val hours = get(Calendar.HOUR_OF_DAY) * 3600.0 // to double
+            val minutes = get(Calendar.MINUTE) * 60.0 // to double
+            val seconds = get(Calendar.SECOND) * 1.0 // to double
+
+            val total = hours + minutes + seconds
+
+            clusters.firstOrNull { it.x <= total }?.let {
+                val shouldOn = if(it.y >= 0.5) "menyalakan" else "matikan"
+                Snackbar.make(btnSwitch, "Anda disarankan untuk $shouldOn lampu", Snackbar.LENGTH_INDEFINITE)
+                    .show()
+            } ?:
+            Snackbar
+                .make(btnSwitch, "Data belum cukup untuk rekomendasi", Snackbar.LENGTH_INDEFINITE)
+                .show()
+
         }
     }
 }
