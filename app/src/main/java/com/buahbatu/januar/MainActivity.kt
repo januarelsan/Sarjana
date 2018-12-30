@@ -6,7 +6,6 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.widget.Toast
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
@@ -16,14 +15,14 @@ import java.util.*
 
 class MainActivity : FragmentActivity() {
     companion object {
-        const val SERVER_URI = "ws://mqtt.thingstud.io:9001"
+        const val SERVER_URI = "m15.cloudmqtt.com:19743"
         const val PUBLISH_TOPIC = "lampu"
-        const val USERNAME = "guest"
-        val PASSWORD = "guest".toCharArray()
+        const val USERNAME = "gocfayyc"
+        val PASSWORD = "kvkYjzypJELm".toCharArray()
         var CLIENT_ID = "android-januar"
     }
 
-    var selectedFragment = 0
+    private var selectedFragment = 0
 
     private var itemCurrent = LampModel(false, "")
 
@@ -60,7 +59,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun createPayload(): String {
-        return Gson().toJson(itemCurrent).toString()
+        return itemCurrent.toPayload()
     }
 
     private fun publishMessage() {
@@ -82,7 +81,7 @@ class MainActivity : FragmentActivity() {
     fun subscribeMessage() {
         if (mqttClient.isConnected) {
             mqttClient.subscribe(PUBLISH_TOPIC, 0) { _, message ->
-                val data = Gson().fromJson(message.toString(), LampModel::class.java)
+                val data = LampModel.fromPayload(message.toString())
                 Data.itemList.add(data)
                 itemCurrent = data
                 navigation.selectedItemId = selectedFragment
