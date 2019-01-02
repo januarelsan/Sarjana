@@ -90,6 +90,8 @@ class MainActivity : FragmentActivity() {
             data.isLampOn = itemCurrent.isLampOn
             data.time = itemCurrent.time
         }
+
+        // save data to firebase
     }
 
     fun subscribeMessage() {
@@ -169,6 +171,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun runAlgo() {
+        // get data from firebase
         val lampData = realm.where(LampModel::class.java).findAll()
 
         if (lampData.size < 1) {
