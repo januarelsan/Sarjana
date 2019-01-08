@@ -92,6 +92,16 @@ class MainActivity : FragmentActivity() {
         }
 
         // save data to firebase
+        val fbKu = FireBaseKu()
+
+        fbKu.saveData(itemCurrent)
+
+        Toast.makeText(this, "Save Dataaaaaa" , Toast.LENGTH_SHORT).show()
+
+//        Snackbar
+//            .make(btnSwitch, "Save Data Cuy", Snackbar.LENGTH_SHORT)
+//            .show()
+
     }
 
     fun subscribeMessage() {
@@ -104,6 +114,8 @@ class MainActivity : FragmentActivity() {
                 saveData()
                 updateButton()
                 navigation.selectedItemId = selectedFragment
+
+
             }
         } else {
             println("JANUAR: MQTT is not connected yet")
@@ -121,6 +133,8 @@ class MainActivity : FragmentActivity() {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     println("JANUAR: onSuccess: ${asyncActionToken.toString()}")
                     subscribeMessage()
+
+
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
