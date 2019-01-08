@@ -20,8 +20,8 @@ class MainActivity : FragmentActivity() {
         const val SERVER_URI = "tcp://m15.cloudmqtt.com:19743"
         const val PUBLISH_TOPIC = "lampu"
         const val USERNAME = "gocfayyc"
-        val PASSWORD = "kvkYjzypJELm".toCharArray()
-        var CLIENT_ID = "android-januar"
+        val PASSWORD = "QYxF48v4Gh6C".toCharArray()
+        var CLIENT_ID = "android-januar-3"
     }
 
     // Get a Realm instance for this thread
