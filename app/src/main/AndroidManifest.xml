@@ -22,8 +22,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".FirebaseActivity"/>
-
         <service android:name="org.eclipse.paho.android.service.MqttService"/>
     </application>
 
