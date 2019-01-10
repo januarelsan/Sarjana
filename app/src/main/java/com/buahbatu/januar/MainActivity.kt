@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.widget.Toast
 import com.buahbatu.januar.kmeans.Algo
-import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
@@ -23,9 +22,6 @@ class MainActivity : FragmentActivity() {
         val PASSWORD = "kvkYjzypJELm".toCharArray()
         var CLIENT_ID = "android-januar"
     }
-
-    // Get a Realm instance for this thread
-    private val realm by lazy { Realm.getDefaultInstance() }
 
     private var selectedFragment = 0
 
@@ -85,11 +81,11 @@ class MainActivity : FragmentActivity() {
 
     private fun saveData() {
         // Persist your data in a transaction
-        realm.executeTransaction {
-            val data = it.createObject(LampModel::class.java)
-            data.isLampOn = itemCurrent.isLampOn
-            data.time = itemCurrent.time
-        }
+//        realm.executeTransaction {
+//            val data = it.createObject(LampModel::class.java)
+//            data.isLampOn = itemCurrent.isLampOn
+//            data.time = itemCurrent.time
+//        }
 
         // save data to firebase
     }
@@ -172,7 +168,8 @@ class MainActivity : FragmentActivity() {
 
     private fun runAlgo() {
         // get data from firebase
-        val lampData = realm.where(LampModel::class.java).findAll()
+//        val lampData = realm.where(LampModel::class.java).findAll()
+        val lampData = listOf<LampModel>()
 
         if (lampData.size < 1) {
             Snackbar

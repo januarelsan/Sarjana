@@ -1,8 +1,6 @@
 package com.buahbatu.januar
 
-import io.realm.RealmObject
-
-open class LampModel() : RealmObject() {
+class LampModel() {
     var isLampOn: Boolean = false
     var time: String = ""
 
