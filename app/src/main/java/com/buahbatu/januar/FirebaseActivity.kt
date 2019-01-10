@@ -2,7 +2,6 @@ package com.buahbatu.januar
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.google.firebase.FirebaseApp
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_firebase.*
 

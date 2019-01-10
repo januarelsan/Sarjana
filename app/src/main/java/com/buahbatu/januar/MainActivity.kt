@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.widget.Toast
 import com.buahbatu.januar.kmeans.Algo
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
@@ -19,9 +20,11 @@ class MainActivity : FragmentActivity() {
         const val SERVER_URI = "tcp://m15.cloudmqtt.com:19743"
         const val PUBLISH_TOPIC = "lampu"
         const val USERNAME = "gocfayyc"
-        val PASSWORD = "kvkYjzypJELm".toCharArray()
+        val PASSWORD = "QYxF48v4Gh6C".toCharArray()
         var CLIENT_ID = "android-januar"
     }
+
+    private val database by lazy { FirebaseDatabase.getInstance().getReference("lamp_data") }
 
     private var selectedFragment = 0
 
@@ -80,14 +83,8 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun saveData() {
-        // Persist your data in a transaction
-//        realm.executeTransaction {
-//            val data = it.createObject(LampModel::class.java)
-//            data.isLampOn = itemCurrent.isLampOn
-//            data.time = itemCurrent.time
-//        }
-
-        // save data to firebase
+        // Persist your data to firebase
+        database.push().setValue(itemCurrent)
     }
 
     fun subscribeMessage() {
