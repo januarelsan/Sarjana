@@ -6,9 +6,13 @@ import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import android.widget.Toast
 import com.buahbatu.januar.kmeans.Algo
-import io.realm.Realm
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.activity_main.*
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
@@ -21,11 +25,10 @@ class MainActivity : FragmentActivity() {
         const val PUBLISH_TOPIC = "lampu"
         const val USERNAME = "gocfayyc"
         val PASSWORD = "QYxF48v4Gh6C".toCharArray()
-        var CLIENT_ID = "android-januar-3"
+        var CLIENT_ID = "android-januar"
     }
 
-    // Get a Realm instance for this thread
-    private val realm by lazy { Realm.getDefaultInstance() }
+    private val database by lazy { FirebaseDatabase.getInstance().getReference("lamp_data") }
 
     private var selectedFragment = 0
 
@@ -84,14 +87,8 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun saveData() {
-        // Persist your data in a transaction
-        realm.executeTransaction {
-            val data = it.createObject(LampModel::class.java)
-            data.isLampOn = itemCurrent.isLampOn
-            data.time = itemCurrent.time
-        }
-
-        // save data to firebase
+        // Persist your data to firebase
+        database.push().setValue(itemCurrent)
     }
 
     fun subscribeMessage() {
@@ -167,14 +164,25 @@ class MainActivity : FragmentActivity() {
             publishMessage()
         }
 
-        runAlgo()
+        getFirebaseData()
     }
 
-    private fun runAlgo() {
+    private fun getFirebaseData() {
         // get data from firebase
-        val lampData = realm.where(LampModel::class.java).findAll()
+        database.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w(MainActivity::class.java.simpleName, "runAlgo", databaseError.toException())
+            }
 
-        if (lampData.size < 1) {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val lampData = dataSnapshot.children.mapNotNull { it.getValue(LampModel::class.java) }
+                runAlgo(lampData)
+            }
+        })
+    }
+
+    private fun runAlgo(lampData: List<LampModel>) {
+        if (lampData.isEmpty()) {
             Snackbar
                 .make(btnSwitch, "Data belum cukup untuk rekomendasi", Snackbar.LENGTH_SHORT)
                 .show()
@@ -192,8 +200,13 @@ class MainActivity : FragmentActivity() {
 
             clusters.firstOrNull { it.x <= total }?.let {
                 val shouldOn = if(it.y >= 0.5) "menyalakan" else "matikan"
-                Snackbar.make(btnSwitch, "Anda disarankan untuk $shouldOn lampu", Snackbar.LENGTH_SHORT)
-                    .show()
+                Snackbar.make(btnSwitch, "Anda disarankan untuk $shouldOn lampu", Snackbar.LENGTH_INDEFINITE).apply {
+                    setAction("OK") {
+                        dismiss()
+                    }
+
+                    show()
+                }
             } ?:
             Snackbar
                 .make(btnSwitch, "Data belum cukup untuk rekomendasi", Snackbar.LENGTH_SHORT)
