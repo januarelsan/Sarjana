@@ -88,14 +88,20 @@ class MainActivity : FragmentActivity() {
 
     private fun saveData() {
         // Persist your data to firebase
-        database.push().setValue(itemCurrent)
+        database.child(itemCurrent.time).setValue(itemCurrent)
     }
 
     fun subscribeMessage() {
         if (mqttClient.isConnected) {
             mqttClient.subscribe(PUBLISH_TOPIC, 0) { _, message ->
                 val data = LampModel.fromPayload(message.toString())
-                Data.itemList.add(data)
+
+                Data.itemList
+                    .any { it.time == data.time }
+                    .let { exist ->
+                        if (!exist) Data.itemList.add(data)
+                    }
+
                 itemCurrent = data
 
                 saveData()
