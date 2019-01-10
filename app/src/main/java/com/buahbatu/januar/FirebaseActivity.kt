@@ -8,18 +8,14 @@ import kotlinx.android.synthetic.main.activity_firebase.*
 
 class FirebaseActivity : AppCompatActivity() {
 
-    // Write a message to the database
-    private val database by lazy { FirebaseDatabase.getInstance() }
-    private val myRef by lazy { database.getReference("message") }
+    private val database by lazy { FirebaseDatabase.getInstance().getReference("lamp_data") }
 
     fun onClick() {
-        myRef.setValue("Hello, World!")
+        database.push().setValue(LampModel(isLampOn = false, time = "besok"))
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_firebase)
-
-        FirebaseApp.initializeApp(this)
 
         btnFirebase.setOnClickListener {
             onClick()
