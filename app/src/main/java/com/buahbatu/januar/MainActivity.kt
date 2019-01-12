@@ -24,7 +24,7 @@ class MainActivity : FragmentActivity() {
         const val SERVER_URI = "tcp://m15.cloudmqtt.com:19743"
         const val PUBLISH_TOPIC = "lampu"
         const val USERNAME = "gocfayyc"
-        val PASSWORD = "QYxF48v4Gh6C".toCharArray()
+        val PASSWORD = "9Jg7UpB4c9yz".toCharArray()
         var CLIENT_ID = "android-januar"
     }
 
@@ -88,7 +88,7 @@ class MainActivity : FragmentActivity() {
 
     private fun saveData() {
         // Persist your data to firebase
-        database.child(itemCurrent.time).setValue(itemCurrent)
+        database.push().setValue(itemCurrent)
     }
 
     fun subscribeMessage() {
