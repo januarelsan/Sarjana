@@ -5,14 +5,21 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.data_fragment.*
 import kotlinx.android.synthetic.main.lamp_item.view.*
 
 
 class DataFragment : Fragment() {
+
+    private val database by lazy { FirebaseDatabase.getInstance().getReference("lamp_data") }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.data_fragment, container, false)
@@ -24,8 +31,34 @@ class DataFragment : Fragment() {
         rvData.adapter = adapter
         ptrLayout.setOnRefreshListener {
             ptrLayout.isRefreshing = false
-            adapter.notifyDataSetChanged()
+            loadNewData(adapter)
         }
+    }
+
+    fun loadNewData(adapter: Adapter) {
+        getFirebaseData(adapter)
+    }
+
+    private fun getFirebaseData(adapter: Adapter) {
+        // get data from firebase
+        database.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w(MainActivity::class.java.simpleName, "runAlgo", databaseError.toException())
+            }
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val lampData = dataSnapshot.children.mapNotNull { it.getValue(LampModel::class.java) }
+                lampData.forEach { data ->
+                    Data.itemList
+                        .any { it.time == data.time }
+                        .let { exist ->
+                            if (!exist) Data.itemList.add(data)
+                        }
+                }
+
+                adapter.notifyDataSetChanged()
+            }
+        })
     }
 
     class Adapter : RecyclerView.Adapter<ViewHolder>() {
