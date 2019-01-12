@@ -182,6 +182,13 @@ class MainActivity : FragmentActivity() {
 
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val lampData = dataSnapshot.children.mapNotNull { it.getValue(LampModel::class.java) }
+                lampData.forEach { data ->
+                    Data.itemList
+                        .any { it.time == data.time }
+                        .let { exist ->
+                            if (!exist) Data.itemList.add(data)
+                        }
+                }
                 runAlgo(lampData)
             }
         })
