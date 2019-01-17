@@ -57,6 +57,15 @@ class MainActivity : FragmentActivity() {
                 }
                 return@OnNavigationItemSelectedListener true
             }
+
+            R.id.navigation_setting -> {
+                selectedFragment = 1
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.frame, SettingFragment())
+                    commit()
+                }
+                return@OnNavigationItemSelectedListener true
+            }
         }
         false
     }
@@ -189,7 +198,7 @@ class MainActivity : FragmentActivity() {
                             if (!exist) Data.itemList.add(data)
                         }
                 }
-                runAlgo(lampData)
+                runAlgo(Data.itemList)
             }
         })
     }
@@ -202,7 +211,8 @@ class MainActivity : FragmentActivity() {
             return
         }
 
-        val clusters = Algo(lampData).run()
+        val kCount = if (Data.myKCount != 0) Data.myKCount else Data.kCount
+        val clusters = Algo(lampData, kCount).run().cluster
 
         Calendar.getInstance().run {
             val hours = get(Calendar.HOUR_OF_DAY) * 3600.0 // to double

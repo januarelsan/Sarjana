@@ -29,4 +29,6 @@ const val TimeFormat = "MM/dd/yy hh:mm:ss.s"
 
 object Data {
     val itemList = mutableListOf<LampModel>()
+    const val kCount = 2
+    var myKCount = 0
 }

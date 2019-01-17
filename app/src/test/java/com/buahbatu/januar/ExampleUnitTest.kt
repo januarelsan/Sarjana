@@ -26,10 +26,10 @@ class ExampleUnitTest {
             LampModel(isLampOn = true, time = "12/31/2018 19:00:00.0")
         )
 
-        val cluster = Algo(dataset).run()
+        val cluster = Algo(dataset, 4).run()
         println(cluster)
-        assertEquals(cluster[0], TransformedLampModel(1.0, 66600.0))
-        assertEquals(cluster[1], TransformedLampModel(0.0, 21600.0))
+        assertEquals(cluster.cluster[0], TransformedLampModel(1.0, 66600.0))
+        assertEquals(cluster.cluster[1], TransformedLampModel(0.0, 21600.0))
     }
 
     @Test

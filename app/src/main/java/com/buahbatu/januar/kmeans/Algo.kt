@@ -1,5 +1,6 @@
 package com.buahbatu.januar.kmeans
 
+import com.buahbatu.januar.Data
 import com.buahbatu.januar.LampModel
 import com.buahbatu.januar.TimeFormat
 import java.text.SimpleDateFormat
@@ -44,12 +45,13 @@ fun List<TransformedLampModel>.isClosestFrom(a: TransformedLampModel) = map {
     it.indexOf(it.min())
 }
 
-class Algo(dataset: List<LampModel>) {
+class AlgoReturn(val cluster: List<TransformedLampModel>, val sse: Double)
 
+class Algo(dataset: List<LampModel>, private val kCount: Int = Data.kCount) {
     private val transformedDataSet = dataset.map { TransformedLampModel.transformed(it) }
 
-    fun run(clusters: List<TransformedLampModel> = (1..2).map { transformedDataSet[0].copy() }
-            , maxIteration: Int = -1) : List<TransformedLampModel> {
+    fun run(clusters: List<TransformedLampModel> = (0 until kCount).map { transformedDataSet[it].copy() },
+            maxIteration: Int = -1) : AlgoReturn {
 
         val clusterMap = clusters.mapIndexed { _, _ ->
             mutableListOf<TransformedLampModel>()
@@ -71,9 +73,16 @@ class Algo(dataset: List<LampModel>) {
         }
 
         return if (!isClusterPointMoved || maxIteration == 0) {
-            newCluster
+            AlgoReturn(newCluster, calculateSSE(newCluster, clusterMap))
         } else {
             run(newCluster, maxIteration - 1)
         }
     }
+
+    private fun calculateSSE(clusters: List<TransformedLampModel>, clusterMap: List<List<TransformedLampModel>>)
+            = clusterMap.mapIndexed { index, cluster ->
+                cluster.map {
+                    TransformedLampModel.distance(it, clusters[index])
+                }.sum()
+            }.sum()
 }

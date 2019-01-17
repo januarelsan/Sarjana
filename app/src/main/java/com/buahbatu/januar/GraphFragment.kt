@@ -31,6 +31,7 @@ class GraphFragment : Fragment() {
             removeAllSeries()
             addSeries(series)
             viewport.isScalable = true
+            viewport.isScrollable = true
 
             // set date label formatter
             gridLabelRenderer.labelFormatter = LabelFormatter()
