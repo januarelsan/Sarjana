@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.buahbatu.januar.kmeans.Algo
+import com.buahbatu.januar.kmeans.TransformedLampModel
 import com.jjoe64.graphview.series.DataPoint
 import kotlinx.android.synthetic.main.fragment_setting.*
 import com.jjoe64.graphview.series.LineGraphSeries
@@ -46,9 +47,22 @@ class SettingFragment : Fragment() {
 
         val count = Data.itemList.size
         val sseList = mutableListOf<Double>()
-        for (i in Data.kCount..count) {
-            sseList.add(Algo(Data.itemList, i).run().sse)
+        val clusters = mutableListOf<List<TransformedLampModel>>()
+        val clusterMaps = mutableListOf<List<List<TransformedLampModel>>>()
+        for (i in 2..count) {
+            val algo = Algo(Data.itemList, i).run()
+            sseList.add(algo.sse)
+            clusters.add(algo.cluster)
+            clusterMaps.add(algo.clusterMap)
         }
+
+        val text = clusters.zip(clusterMaps).mapIndexed { index, pair ->
+            val inside = pair.first.zip(pair.second).joinToString(separator = "\n") {
+                "Centroid: ${it.first}\nMember: ${it.second}"
+            }
+            "=========K ${index + Data.kCount}: SSE ${sseList[index]}==========\n$inside"
+        }.joinToString(separator = "\n")
+        tvResult.text = text
 
         graphSetting.run {
             viewport.isScrollable = true

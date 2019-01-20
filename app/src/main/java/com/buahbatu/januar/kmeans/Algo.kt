@@ -18,7 +18,7 @@ class TransformedLampModel(val y: Double = 0.0, val x: Double = 0.0) {
         val hours = (x / 3600).toInt()
         val minute = ((x % 3600) / 60).toInt()
         val second = ((x % 3600) % 60).toInt()
-        return "$hours:$minute:$second | ${if (y > 0.5) "on" else "off"}"
+        return "$hours:$minute:$second | ${if (y >= 0.5) "on" else "off"}"
     }
 
     companion object {
