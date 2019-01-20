@@ -1,5 +1,6 @@
 package com.buahbatu.januar
 
+import android.app.AlertDialog
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
@@ -212,7 +213,7 @@ class MainActivity : FragmentActivity() {
         }
 
         val kCount = if (Data.myKCount != 0) Data.myKCount else Data.kCount
-        val clusters = Algo(lampData, kCount).run().cluster
+        val algo = Algo(lampData, kCount).run()
 
         Calendar.getInstance().run {
             val hours = get(Calendar.HOUR_OF_DAY) * 3600.0 // to double
@@ -221,7 +222,7 @@ class MainActivity : FragmentActivity() {
 
             val total = hours + minutes + seconds
 
-            clusters.firstOrNull { it.x <= total }?.let {
+            algo.cluster.firstOrNull { it.x <= total }?.let {
                 val shouldOn = if(it.y >= 0.5) "menyalakan" else "matikan"
                 Snackbar.make(btnSwitch, "Anda disarankan untuk $shouldOn lampu", Snackbar.LENGTH_INDEFINITE).apply {
                     setAction("OK") {
@@ -230,11 +231,26 @@ class MainActivity : FragmentActivity() {
 
                     show()
                 }
+
+                val clustersString = algo.cluster.joinToString(separator = "\n") { cluster -> "Cluster: $cluster" }
+                AlertDialog.Builder(this@MainActivity)
+                    .setMessage(clustersString)
+                    .setPositiveButton("OK") { dialog, _ ->
+                        dialog.dismiss()
+
+                        val clustersMapString = algo.clusterMap.joinToString(separator = "\n"){ cluster -> "Cluster Member:\n$cluster" }
+                        AlertDialog.Builder(this@MainActivity)
+                            .setMessage(clustersMapString)
+                            .setPositiveButton("OK") { dialog2, _ ->
+                                dialog2.dismiss()
+                            }
+                            .show()
+                    }
+                    .show()
             } ?:
             Snackbar
                 .make(btnSwitch, "Data belum cukup untuk rekomendasi", Snackbar.LENGTH_SHORT)
                 .show()
-
         }
     }
 }

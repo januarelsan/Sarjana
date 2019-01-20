@@ -14,6 +14,13 @@ class TransformedLampModel(val y: Double = 0.0, val x: Double = 0.0) {
         return other is TransformedLampModel && other.x == x && other.y == y
     }
 
+    override fun toString(): String {
+        val hours = (x / 3600).toInt()
+        val minute = ((x % 3600) / 60).toInt()
+        val second = ((x % 3600) % 60).toInt()
+        return "$hours:$minute:$second | ${if (y > 0.5) "on" else "off"}"
+    }
+
     companion object {
         fun distance(a: TransformedLampModel, b: TransformedLampModel) = Math.sqrt (
             Math.pow((a.x - b.x), 2.0) + Math.pow((a.y - b.y), 2.0)
@@ -45,7 +52,7 @@ fun List<TransformedLampModel>.isClosestFrom(a: TransformedLampModel) = map {
     it.indexOf(it.min())
 }
 
-class AlgoReturn(val cluster: List<TransformedLampModel>, val sse: Double)
+class AlgoReturn(val cluster: List<TransformedLampModel>, val sse: Double, val clusterMap: List<List<TransformedLampModel>>)
 
 class Algo(dataset: List<LampModel>, private val kCount: Int = Data.kCount) {
     private val transformedDataSet = dataset.map { TransformedLampModel.transformed(it) }
@@ -73,7 +80,7 @@ class Algo(dataset: List<LampModel>, private val kCount: Int = Data.kCount) {
         }
 
         return if (!isClusterPointMoved || maxIteration == 0) {
-            AlgoReturn(newCluster, calculateSSE(newCluster, clusterMap))
+            AlgoReturn(newCluster, calculateSSE(newCluster, clusterMap), clusterMap)
         } else {
             run(newCluster, maxIteration - 1)
         }
