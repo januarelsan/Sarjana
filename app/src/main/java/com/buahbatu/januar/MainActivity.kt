@@ -233,20 +233,6 @@ class MainActivity : FragmentActivity() {
                 }
 
                 val clustersString = algo.cluster.joinToString(separator = "\n") { cluster -> "Cluster: $cluster" }
-                AlertDialog.Builder(this@MainActivity)
-                    .setMessage(clustersString)
-                    .setPositiveButton("OK") { dialog, _ ->
-                        dialog.dismiss()
-
-                        val clustersMapString = algo.clusterMap.joinToString(separator = "\n"){ cluster -> "Cluster Member:\n$cluster" }
-                        AlertDialog.Builder(this@MainActivity)
-                            .setMessage(clustersMapString)
-                            .setPositiveButton("OK") { dialog2, _ ->
-                                dialog2.dismiss()
-                            }
-                            .show()
-                    }
-                    .show()
             } ?:
             Snackbar
                 .make(btnSwitch, "Data belum cukup untuk rekomendasi", Snackbar.LENGTH_SHORT)

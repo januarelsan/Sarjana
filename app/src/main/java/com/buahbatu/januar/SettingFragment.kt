@@ -58,9 +58,9 @@ class SettingFragment : Fragment() {
 
         val text = clusters.zip(clusterMaps).mapIndexed { index, pair ->
             val inside = pair.first.zip(pair.second).joinToString(separator = "\n") {
-                "Centroid: ${it.first}\nMember: ${it.second}"
+                "Centroid: ${it.first}\nMember: ${it.second}\n"
             }
-            "=========K ${index + Data.kCount}: SSE ${sseList[index]}==========\n$inside"
+            "=========K ${index + 2}: SSE ${sseList[index]}==========\n$inside"
         }.joinToString(separator = "\n")
         tvResult.text = text
 
