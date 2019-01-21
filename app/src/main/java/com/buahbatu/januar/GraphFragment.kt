@@ -14,7 +14,6 @@ import java.util.*
 
 
 class GraphFragment : Fragment() {
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.graph_fragment, container, false)
     }
@@ -25,7 +24,7 @@ class GraphFragment : Fragment() {
             val date = format.parse(it.time)
             val value = if (it.isLampOn) 1.0 else 0.0
             DataPoint(date, value)
-        }
+        }.sortedBy { it.x }
         val series = LineGraphSeries<DataPoint>(data.toTypedArray())
         graph.run {
             removeAllSeries()

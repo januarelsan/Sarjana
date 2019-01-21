@@ -152,7 +152,7 @@ class MainActivity : FragmentActivity() {
         super.onDestroy()
     }
 
-    fun updateButton() {
+    private fun updateButton() {
         btnSwitch.supportImageTintList = if (itemCurrent.isLampOn) {
             ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color.colorLight))
         } else {
@@ -231,8 +231,6 @@ class MainActivity : FragmentActivity() {
 
                     show()
                 }
-
-                val clustersString = algo.cluster.joinToString(separator = "\n") { cluster -> "Cluster: $cluster" }
             } ?:
             Snackbar
                 .make(btnSwitch, "Data belum cukup untuk rekomendasi", Snackbar.LENGTH_SHORT)
